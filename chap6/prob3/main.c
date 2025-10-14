@@ -1,12 +1,29 @@
 #include<utime.h>
 #include<stdio.h>
 #include<stdlib.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<sys/time.h>
 
 int main(int argc, char* argv[]){
-	if(argc<2){
-		fprintf(stderr,"사용법: touch file1 \n");
+
+	struct stat buf;
+	struct utimbuf time;
+
+	if(argc<3){
+		fprintf(stderr,"How to use: cptime file1 fil2\n");
+		exit(1);
+	}
+	if(stat(argv[1],&buf)<0){
+		perror("stat()");
 		exit(-1);
 	}
-	utime(argv[1], NULL);
+	time.actime =buf.st_atime;
+	time.modtime=buf.st_mtime;
+
+	if(utime(argv[2],&time))
+		perror("utime");
+	else 
+		exit(0);
 }
 
